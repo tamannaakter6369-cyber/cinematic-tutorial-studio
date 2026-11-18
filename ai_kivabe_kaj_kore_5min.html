@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI কীভাবে কাজ করে? — ৫ মিনিটের অ্যানিমেশন</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#080d1b;color:#eef4ff;font-family:system-ui,-apple-system,"Noto Sans Bengali",sans-serif}
+.wrap{max-width:1000px;margin:auto;padding:16px}.top{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+h1{font-size:clamp(22px,4vw,34px);margin:8px 0}.sub{color:#a9b8d6;margin:0 0 14px}
+.stage{width:100%;aspect-ratio:16/9;background:#0b1430;border:1px solid #24365f;border-radius:16px;overflow:hidden;position:relative}
+canvas{width:100%;height:100%;display:block}
+.controls{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+button,select{background:#182747;color:#fff;border:1px solid #38517f;border-radius:10px;padding:11px 14px;font-size:15px}
+button.primary{background:#2463eb;border-color:#2463eb}.bar{height:8px;background:#1a2946;border-radius:20px;overflow:hidden}.fill{height:100%;width:0;background:#48d6d0}
+.info{display:flex;justify-content:space-between;color:#a9b8d6;font-size:13px;margin:7px 0 14px}
+.note{background:#111d36;border:1px solid #263b64;border-radius:12px;padding:12px;color:#c9d7f2;line-height:1.6;font-size:14px}
+@media(max-width:560px){.wrap{padding:10px}.stage{border-radius:10px}.controls button,.controls select{flex:1}}
+</style></head>
+<body><div class="wrap">
+<div class="top"><div><h1>AI কীভাবে কাজ করে?</h1><p class="sub">৫ মিনিটের 2D + 3D স্টাইলের অ্যানিমেটেড এক্সপ্লেইনার</p></div>
+<select id="ratio"><option value="16:9">16:9 — YouTube</option><option value="9:16">9:16 — Shorts/Reels</option></select></div>
+<div class="stage" id="stage"><canvas id="c" width="1280" height="720"></canvas></div>
+<div class="bar"><div class="fill" id="fill"></div></div><div class="info"><span id="chapter">শুরু</span><span id="clock">00:00 / 05:00</span></div>
+<div class="controls"><button class="primary" id="play">▶ চালু করুন</button><button id="restart">↺ আবার শুরু</button><button id="record">● ভিডিও রেকর্ড</button></div>
+<div class="note"><b>ব্যবহার:</b> Play চাপলে ৫ মিনিটের অ্যানিমেশন চলবে। ভিডিও ফাইল পেতে “ভিডিও রেকর্ড” চাপুন, তারপর Play চাপুন। রেকর্ডিং শেষ হলে ফাইলটি WebM হিসেবে ডাউনলোড হবে। ভালো ফলের জন্য ফোন Landscape রাখুন (16:9)।</div>
+</div>
+<script>
+const c=document.getElementById('c'),ctx=c.getContext('2d'),stage=document.getElementById('stage');
+const ratio=document.getElementById('ratio'),fill=document.getElementById('fill'),clock=document.getElementById('clock'),chapter=document.getElementById('chapter');
+let playing=false,t=0,last=0,raf=0,rec=null,chunks=[],recording=false;
+const scenes=[
+{start:0,end:45,title:"AI কী?",sub:"Artificial Intelligence — যন্ত্রকে বুদ্ধিমান কাজ শেখানোর প্রযুক্তি",tag:"INTRODUCTION"},
+{start:45,end:100,title:"প্রথম ধাপ: ডেটা",sub:"ছবি, লেখা, শব্দ—অনেক উদাহরণ থেকে AI প্যাটার্ন খুঁজে পায়",tag:"DATA"},
+{start:100,end:165,title:"Machine Learning",sub:"ভুল থেকে শেখে, বারবার অনুশীলনে অনুমান আরও ভালো হয়",tag:"LEARNING"},
+{start:165,end:225,title:"Neural Network",sub:"স্তরে স্তরে তথ্য বিশ্লেষণ করে জটিল সম্পর্ক বোঝে",tag:"NEURAL NETWORK"},
+{start:225,end:270,title:"AI উত্তর তৈরি করে",sub:"আপনার প্রশ্ন বুঝে শেখা প্যাটার্নের ভিত্তিতে সম্ভাব্য উত্তর তৈরি করে",tag:"GENERATING"},
+{start:270,end:300,title:"AI আমাদের সহকারী",sub:"সঠিকভাবে ব্যবহার করুন, তথ্য যাচাই করুন—মানুষের বিচারবুদ্ধি গুরুত্বপূর্ণ",tag:"THE FUTURE"}
+];
+const particles=Array.from({length:90},(_,i)=>({x:Math.random(),y:Math.random(),r:2+Math.random()*4,s:.15+Math.random()*.5,p:Math.random()*6.28}));
+function rounded(x,y,w,h,r,fill){ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fillStyle=fill;ctx.fill()}
+function text(str,x,y,size,color='#f3f7ff',align='center',weight=700){ctx.fillStyle=color;ctx.font=`${weight} ${size}px system-ui,"Noto Sans Bengali",sans-serif`;ctx.textAlign=align;ctx.fillText(str,x,y)}
+function line(x1,y1,x2,y2,color='#47d6d0',a=1){ctx.globalAlpha=a;ctx.strokeStyle=color;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.globalAlpha=1}
+function circle(x,y,r,color){ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fillStyle=color;ctx.fill()}
+function drawBrain(cx,cy,scale,tm){
+ ctx.save();ctx.translate(cx,cy);ctx.scale(scale,scale);
+ // stylized brain hemispheres
+ ctx.fillStyle='#6b7dff';ctx.strokeStyle='#aab6ff';ctx.lineWidth=4;
+ for(let i=0;i<7;i++){let a=i*Math.PI/3.5;ctx.beginPath();ctx.ellipse(Math.cos(a)*25,Math.sin(a)*24,43,34,a,0,Math.PI*2);ctx.fill();ctx.stroke()}
+ ctx.strokeStyle='#d5dcff';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(0,-48);ctx.bezierCurveTo(-12,-15,12,15,0,48);ctx.stroke();
+ ctx.restore();
+}
+function network(cx,cy,scale,tm){
+ const layers=[4,6,6,3],xs=[-210,-70,70,210];
+ for(let l=0;l<layers.length-1;l++)for(let i=0;i<layers[l];i++)for(let j=0;j<layers[l+1];j++){
+  let y1=(i-(layers[l]-1)/2)*52,y2=(j-(layers[l+1]-1)/2)*52;
+  line(cx+(xs[l])*scale,cy+y1*scale,cx+xs[l+1]*scale,cy+y2*scale,'#4968a8',.55);
+ }
+ for(let l=0;l<layers.length;l++)for(let i=0;i<layers[l];i++){
+  let y=(i-(layers[l]-1)/2)*52;circle(cx+xs[l]*scale,cy+y*scale,10*scale,(Math.sin(tm*3+l+i)+1)>1.1?'#55e0d2':'#8495ff');
+ }
+}
+function draw(){
+ const W=c.width,H=c.height,tm=t;
+ let g=ctx.createLinearGradient(0,0,W,H);g.addColorStop(0,'#0a1430');g.addColorStop(1,'#171044');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+ particles.forEach((p,i)=>{let x=((p.x*W+tm*20*p.s)%W),y=(p.y*H+Math.sin(tm*p.s+p.p)*18);circle(x,y,p.r,'rgba(104,173,255,.42)')});
+ let sc=scenes.find(s=>tm>=s.start&&tm<s.end)||scenes[scenes.length-1],local=(tm-sc.start)/(sc.end-sc.start);
+ // top label and headline
+ text("৫ মিনিটের সহজ ব্যাখ্যা",W/2,58,22,'#75e4dc');
+ text(sc.title,W/2,130,48,'#ffffff');
+ text(sc.sub,W/2,177,22,'#c6d4f2','center',500);
+ // scene illustrations
+ if(sc.tag==='INTRODUCTION'){
+  drawBrain(W/2,H*.53,1.55,.0);
+  for(let i=0;i<6;i++){let a=tm*0.7+i*Math.PI/3;circle(W/2+Math.cos(a)*210,H*.53+Math.sin(a)*130,8,'#4de1d1');line(W/2+Math.cos(a)*210,H*.53+Math.sin(a)*130,W/2+Math.cos(a)*100,H*.53+Math.sin(a)*65,'#4de1d1',.5)}
+  text("মানুষের মতো চিন্তা নয়—তথ্য থেকে প্যাটার্ন শেখা",W/2,H*.83,21,'#dce7ff','center',500);
+ } else if(sc.tag==='DATA'){
+  const labels=['ছবি','লেখা','শব্দ','ভিডিও'];
+  labels.forEach((v,i)=>{let x=W/2+(i-1.5)*220;rounded(x-78,H*.43-65,156,130,18,['#1b4770','#3b326f','#245b68','#48356f'][i]);text(['▧','Aa','♫','▶'][i],x,H*.43+5,42,'#6fe5df');text(v,x,H*.43+48,23)});
+  line(W*.22,H*.68,W*.78,H*.68,'#58d9d1',.8);text("ডেটা → উদাহরণ → প্যাটার্ন",W/2,H*.79,30,'#ffffff');
+ } else if(sc.tag==='LEARNING'){
+  rounded(W*.18,H*.34,W*.64,220,24,'#111f45');
+  text("অনুমান",W*.32,H*.48,25);text("তুলনা",W*.5,H*.48,25);text("সংশোধন",W*.68,H*.48,25);
+  line(W*.37,H*.53,W*.45,H*.53);line(W*.55,H*.53,W*.63,H*.53);
+  let bars=[.28,.48,.66,.82,.94];bars.forEach((v,i)=>{rounded(W*.29+i*90,H*.65,48,100*v,8,'#4bd8ce')});
+  text("অনুশীলন যত বেশি, শেখা তত উন্নত",W/2,H*.86,25,'#dce7ff','center',500);
+ } else if(sc.tag==='NEURAL NETWORK'){
+  network(W/2,H*.52,1.05,tm);
+  text("ইনপুট",W*.22,H*.78,19,'#b9caff');text("লুকানো স্তর",W*.5,H*.78,19,'#b9caff');text("আউটপুট",W*.78,H*.78,19,'#b9caff');
+ } else if(sc.tag==='GENERATING'){
+  rounded(W*.16,H*.35,W*.68,205,22,'#14264d');
+  text("আপনার প্রশ্ন",W*.31,H*.47,23,'#75e4dc');text("AI মডেল",W*.5,H*.47,23);text("উত্তর",W*.69,H*.47,23,'#75e4dc');
+  line(W*.38,H*.51,W*.44,H*.51);line(W*.56,H*.51,W*.62,H*.51);
+  text("প্রশ্ন → প্রসঙ্গ → সম্ভাব্য শব্দের ধারাবাহিকতা",W/2,H*.68,22,'#e1eaff','center',500);
+  text("AI সবসময় সঠিক নয়—উত্তর যাচাই করুন",W/2,H*.82,23,'#ffcf83');
+ } else {
+  drawBrain(W*.35,H*.51,1.0,tm);rounded(W*.53,H*.37,W*.3,180,20,'#172b51');
+  text("মানুষ + AI",W*.68,H*.48,30,'#72e5db');text("সহযোগিতাই শক্তি",W*.68,H*.59,23);text("ভাবুন • যাচাই করুন • শিখুন",W*.68,H*.68,18,'#d4def5', 'center',500);
+ }
+ // footer and timeline chapter dots
+ rounded(40,H-65,W-80,2,2,'#40537b');
+ ctx.fillStyle='#5de0d2';ctx.fillRect(40,H-66,(W-80)*(tm/300),4);
+ text("AI কীভাবে কাজ করে?",W/2,H-25,15,'#a9badb','center',500);
+}
+function updateUI(){
+ fill.style.width=(t/300*100)+'%';let m=Math.floor(t/60),s=Math.floor(t%60);clock.textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')} / 05:00`;
+ let sc=scenes.find(s=>t>=s.start&&t<s.end)||scenes[5];chapter.textContent=sc.title;
+}
+function tick(now){if(!playing)return;if(!last)last=now;t+=(now-last)/1000;last=now;if(t>=300){t=300;playing=false;document.getElementById('play').textContent='▶ আবার চালান';if(recording)stopRecord()}draw();updateUI();if(playing)raf=requestAnimationFrame(tick)}
+function play(){if(t>=300)t=0;playing=true;last=0;document.getElementById('play').textContent='Ⅱ বিরতি';raf=requestAnimationFrame(tick)}
+document.getElementById('play').onclick=()=>{if(playing){playing=false;cancelAnimationFrame(raf);document.getElementById('play').textContent='▶ চালু করুন'}else play()};
+document.getElementById('restart').onclick=()=>{playing=false;cancelAnimationFrame(raf);t=0;draw();updateUI();document.getElementById('play').textContent='▶ চালু করুন'};
+ratio.onchange=()=>{if(ratio.value==='9:16'){c.width=720;c.height=1280;stage.style.aspectRatio='9/16'}else{c.width=1280;c.height=720;stage.style.aspectRatio='16/9'}draw()};
+function stopRecord(){if(rec&&rec.state!=='inactive')rec.stop();recording=false;document.getElementById('record').textContent='● ভিডিও রেকর্ড'}
+document.getElementById('record').onclick=()=>{
+ if(recording){stopRecord();return}
+ if(!c.captureStream||!window.MediaRecorder){alert('এই ব্রাউজারে রেকর্ডিং সমর্থিত নয়। Chrome ব্যবহার করে দেখুন।');return}
+ chunks=[];let stream=c.captureStream(30);
+ try{rec=new MediaRecorder(stream,{mimeType:'video/webm;codecs=vp9'})}catch(e){rec=new MediaRecorder(stream)}
+ rec.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};
+ rec.onstop=()=>{let blob=new Blob(chunks,{type:'video/webm'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='AI-kivabe-kaj-kore-5-minute.webm';a.click();setTimeout(()=>URL.revokeObjectURL(url),30000)};
+ rec.start();recording=true;document.getElementById('record').textContent='■ রেকর্ড বন্ধ';
+ t=0;draw();updateUI();play();
+};
+draw();updateUI();
+</script></body></html>
