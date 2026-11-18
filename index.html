@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>2D + 3D Tutorial Animation Studio</title>
+<style>
+:root{--bg:#07111f;--cyan:#65e5ff;--gold:#ffc66d;--white:#eef7ff}
+*{box-sizing:border-box}body{margin:0;background:#050b14;color:var(--white);font:14px system-ui,Arial;overflow-x:hidden}
+header{padding:12px 14px;display:flex;justify-content:space-between;align-items:center;background:#0b1727;gap:8px;flex-wrap:wrap}
+h1{font-size:15px;margin:0}small{color:#9fb4c9}
+.controls{display:flex;gap:7px;flex-wrap:wrap;padding:10px;background:#0b1727;position:sticky;top:0;z-index:5}
+button,select{background:#142940;color:white;border:1px solid #31516d;border-radius:9px;padding:9px 11px;font-weight:600}
+button.primary{background:#087e9e;border-color:#20c7e9}button:disabled{opacity:.45}
+#stageWrap{width:100%;display:flex;justify-content:center;padding:10px}
+#stage{width:min(100%,960px);aspect-ratio:16/9;position:relative;overflow:hidden;background:radial-gradient(ellipse at 50% 45%,#123454,#07111f 68%);border:1px solid #24445e;border-radius:12px}
+#gl{position:absolute;inset:0;width:100%;height:100%;display:block}
+.overlay{position:absolute;inset:0;pointer-events:none;padding:6%;display:flex;flex-direction:column;justify-content:space-between}
+.kicker{font-size:clamp(9px,1.5vw,15px);letter-spacing:.22em;color:var(--cyan);text-transform:uppercase;font-weight:800}
+h2{font-size:clamp(23px,5vw,58px);line-height:1.02;max-width:78%;margin:10px 0;text-shadow:0 4px 25px #000}
+.desc{font-size:clamp(11px,1.8vw,19px);line-height:1.4;max-width:68%;color:#d2e5f6}
+.footer{display:flex;justify-content:space-between;align-items:end;gap:10px}
+.pill{border:1px solid #5cdfff66;border-radius:99px;padding:5px 10px;background:#061625aa;font-size:clamp(8px,1.2vw,12px);color:#aeefff}
+#progress{height:4px;background:#18324a}#bar{height:100%;width:0;background:linear-gradient(90deg,#42d8ff,#ffc66d)}
+#status{padding:8px 13px;color:#a9c0d5;font-size:12px}
+#script{padding:12px 14px;line-height:1.55;color:#bfd0df}
+#script summary{color:#7fe5ff;font-weight:700;cursor:pointer}
+textarea{width:100%;min-height:100px;background:#0b1727;color:#eaf6ff;border:1px solid #31516d;border-radius:9px;padding:10px}
+@media(max-width:600px){header{align-items:flex-start} .controls>*{flex:1 1 auto}#stageWrap{padding:5px}#stage{border-radius:6px}}
+</style>
+</head>
+<body>
+<header><div><h1>✦ CINEMATIC EXPLAINER STUDIO</h1><small>Android-friendly • 2D + 3D • browser render</small></div><small id="clock">00:00 / 06:00</small></header>
+<div class="controls">
+<select id="ratio"><option value="16/9">16:9 YouTube</option><option value="9/16">9:16 Shorts / Reels</option></select>
+<button id="play" class="primary">▶ Play</button><button id="restart">↺ Restart</button>
+<button id="record" class="primary">● Record WebM</button><button id="stop" disabled>■ Stop & Save</button>
+</div>
+<div id="stageWrap"><div id="stage"><canvas id="gl"></canvas><div class="overlay">
+<div><div class="kicker" id="kicker">DIGITAL WORLD / 01</div><h2 id="title">HOW THE INTERNET WORKS</h2><div class="desc" id="desc">A journey through the invisible network connecting billions of devices.</div></div>
+<div class="footer"><span class="pill" id="tag">FROM YOUR PHONE TO THE WORLD</span><span class="pill" id="chapter">CHAPTER 01 / 06</span></div>
+</div></div></div>
+<div id="progress"><div id="bar"></div></div><div id="status">Ready. Press Play to preview. Record captures the animation in real time.</div>
+<details id="script" open><summary>৬ মিনিটের নমুনা Tutorial Script (নিজের বিষয় দিয়ে বদলাতে পারো)</summary>
+<p><b>01 — The connection:</b> The internet is a network of networks. Your phone sends a request through Wi-Fi or mobile data to your internet provider.</p>
+<p><b>02 — The router:</b> A router directs data toward its destination. It is like a digital traffic controller, choosing a path across connected networks.</p>
+<p><b>03 — Packets:</b> Information is split into small packets. Each packet carries addressing information so networks can move it independently.</p>
+<p><b>04 — DNS:</b> DNS translates a human-friendly domain name into an IP address, helping your device find the right server.</p>
+<p><b>05 — The server:</b> The server receives the request, finds the content and sends data back. Your browser assembles it into the page or video you see.</p>
+<p><b>06 — Security:</b> HTTPS encrypts data in transit. The network is powerful, but safe browsing, updates and strong passwords still matter.</p>
+<p><i>Note: This is a visual explainer template. Add your own narration and verify technical claims for specialist topics.</i></p>
+</details>
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+const stage=document.querySelector('#stage'),canvas=document.querySelector('#gl');
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true,preserveDrawingBuffer:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,1.6));renderer.setSize(stage.clientWidth,stage.clientHeight,false);
+renderer.outputColorSpace=THREE.SRGBColorSpace;
+const scene=new THREE.Scene();const camera=new THREE.PerspectiveCamera(38,16/9,.1,100);camera.position.set(0,0,10);
+scene.add(new THREE.AmbientLight(0x9bcfff,1.5));const key=new THREE.PointLight(0x65ddff,45);key.position.set(4,5,7);scene.add(key);
+const gold=new THREE.PointLight(0xffb75e,22);gold.position.set(-5,-2,3);scene.add(gold);
+const root=new THREE.Group();scene.add(root);
+const mat=(c,metal=0.25,rough=.35)=>new THREE.MeshStandardMaterial({color:c,metalness:metal,roughness:rough});
+const cyan=mat(0x39c9ef,.5),blue=mat(0x174b80,.55),white=mat(0xdcefff,.25),orange=mat(0xffb65c,.4);
+function sphere(r,m,x,y,z,parent=root){const o=new THREE.Mesh(new THREE.SphereGeometry(r,32,24),m);o.position.set(x,y,z);parent.add(o);return o}
+function box(w,h,d,m,x,y,z,parent=root){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);o.position.set(x,y,z);parent.add(o);return o}
+function line(a,b,color=0x5cddff){const g=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(...a),new THREE.Vector3(...b)]);const o=new THREE.Line(g,new THREE.LineBasicMaterial({color,transparent:true,opacity:.65}));root.add(o);return o}
+const globe=sphere(2,blue,0,0,0);const wire=new THREE.Mesh(new THREE.SphereGeometry(2.035,24,16),new THREE.MeshBasicMaterial({color:0x53dfff,wireframe:true,transparent:true,opacity:.25}));root.add(wire);
+const nodes=[];for(let i=0;i<24;i++){let a=i*2.399,b=Math.acos(1-2*(i+.5)/24);let v=[2.08*Math.sin(b)*Math.cos(a),2.08*Math.cos(b),2.08*Math.sin(b)*Math.sin(a)];nodes.push(sphere(.055, i%4===0?orange:cyan,...v));}
+const phone=new THREE.Group();root.add(phone);box(.8,1.45,.12,white,-3.3,-.1,0,phone);box(.68,1.22,.035,blue,-3.3,-.08,.08,phone);sphere(.045,cyan,-3.3,-.72,.12,phone);
+const router=new THREE.Group();root.add(router);box(1.2,.25,.65,cyan,3.1,-.1,0,router);for(let i=0;i<3;i++){let ant=box(.055,.7,.055,white,2.75+i*.35,.38,0,router);ant.rotation.z=-.12+i*.12;}
+const server=new THREE.Group();root.add(server);for(let i=0;i<3;i++){box(1.1,.55,.65,blue,0,1.1-i*.7,0,server);sphere(.055, i===0?orange:cyan,-.38,1.1-i*.7,.34,server);}
+const shield=new THREE.Group();root.add(shield);const sh=new THREE.Mesh(new THREE.IcosahedronGeometry(.85,1),new THREE.MeshStandardMaterial({color:0x164c73,metalness:.4,roughness:.2,wireframe:false}));shield.add(sh);const check=line([-.28,0,.75],[ -.05,-.25,.75],0xffc66d);const check2=line([-.05,-.25,.75],[.38,.3,.75],0xffc66d);root.add(shield);
+const packets=[];for(let i=0;i<14;i++){let p=sphere(.075,i%3===0?orange:cyan,0,0,0);packets.push(p);}
+const stars=new THREE.Group();scene.add(stars);for(let i=0;i<180;i++){let s=sphere(.012,white,(Math.random()-.5)*19,(Math.random()-.5)*11,-3-Math.random()*8,stars);}
+const chapters=[
+["THE CONNECTION","HOW THE INTERNET WORKS","Billions of devices. One connected world.","FROM YOUR PHONE TO THE WORLD"],
+["THE ROUTER","FINDING A PATH","Routers move information between networks, one step at a time.","THE DIGITAL TRAFFIC CONTROLLER"],
+["DATA PACKETS","SMALL PIECES, BIG JOURNEY","Large messages travel as smaller packets that can take different routes.","BREAK IT DOWN • SEND • REASSEMBLE"],
+["DNS","NAMES INTO ADDRESSES","DNS helps your device locate the server behind a website name.","THE INTERNET'S ADDRESS BOOK"],
+["THE SERVER","REQUEST → RESPONSE","A server processes the request and sends the content back to your browser.","CONTENT LIVES ON SERVERS"],
+["STAY SECURE","ENCRYPT THE CONNECTION","HTTPS helps protect information as it travels across the network.","CONNECT SMARTER"]
+];
+let duration=360,elapsed=0,playing=false,last=0,raf=0,recorder=null,chunks=[];
+const title=document.querySelector('#title'),desc=document.querySelector('#desc'),kicker=document.querySelector('#kicker'),tag=document.querySelector('#tag'),chapter=document.querySelector('#chapter');
+function layout(){let portrait=document.querySelector('#ratio').value==='9/16';stage.style.aspectRatio=portrait?'9/16':'16/9';let w=stage.clientWidth,h=stage.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.fov=portrait?48:38;camera.position.set(0,0,portrait?11:10);camera.updateProjectionMatrix();}
+new ResizeObserver(layout).observe(stage);layout();
+function setChapter(i){let c=chapters[i];kicker.textContent='DIGITAL WORLD / '+String(i+1).padStart(2,'0');title.textContent=c[1];desc.textContent=c[2];tag.textContent=c[3];chapter.textContent=`CHAPTER ${String(i+1).padStart(2,'0')} / 06`;}
+function update(t){let i=Math.min(5,Math.floor(t/60)),local=(t%60)/60;setChapter(i);
+root.position.x=Math.sin(t*.18)*.18;root.rotation.y=t*.12;root.rotation.x=Math.sin(t*.23)*.08;
+globe.visible=i===0||i===1||i===2||i===3;wire.visible=globe.visible;nodes.forEach(n=>n.visible=globe.visible);
+phone.visible=i===0;router.visible=i===1;packets.forEach((p,j)=>{p.visible=i===1||i===2||i===4;p.position.set(-2.4+((local*2+j*.13)%1)*4.8,Math.sin(t*2+j)*.5,Math.cos(j)*.45);});
+server.visible=i===3||i===4;server.rotation.y=Math.sin(t*.5)*.2;
+shield.visible=i===5;shield.rotation.y=Math.sin(t*.7)*.25;
+if(i===0){phone.position.x=Math.sin(t*1.3)*.18;globe.scale.setScalar(1+Math.sin(t*1.5)*.025);}
+if(i===1){router.rotation.y=Math.sin(t)*.3;globe.scale.setScalar(1);}
+if(i===2){globe.scale.setScalar(1-local*.25);packets.forEach((p,j)=>p.scale.setScalar(.7+Math.sin(t*4+j)*.2));}
+if(i===3){globe.scale.setScalar(.85);server.position.x=2.7; }
+if(i===4){server.position.x=0;server.scale.setScalar(1+Math.sin(t*2)*.025);}
+if(i===5){shield.scale.setScalar(1+Math.sin(t*2)*.04);}
+renderer.render(scene,camera);
+document.querySelector('#bar').style.width=(t/duration*100)+'%';document.querySelector('#clock').textContent=fmt(t)+' / 06:00';
+}
+function fmt(s){return String(Math.floor(s/60)).padStart(2,'0')+':'+String(Math.floor(s%60)).padStart(2,'0')}
+function frame(now){if(!playing)return;let dt=Math.min(.05,(now-last)/1000||0);last=now;elapsed+=dt;if(elapsed>=duration){elapsed=duration;playing=false;document.querySelector('#play').textContent='▶ Play';}update(elapsed);if(playing)raf=requestAnimationFrame(frame);}
+function play(){if(elapsed>=duration)elapsed=0;playing=true;last=performance.now();document.querySelector('#play').textContent='Ⅱ Pause';raf=requestAnimationFrame(frame);}
+document.querySelector('#play').onclick=()=>{if(playing){playing=false;cancelAnimationFrame(raf);document.querySelector('#play').textContent='▶ Play';}else play();};
+document.querySelector('#restart').onclick=()=>{playing=false;cancelAnimationFrame(raf);elapsed=0;update(0);document.querySelector('#play').textContent='▶ Play';};
+document.querySelector('#ratio').onchange=layout;
+document.querySelector('#record').onclick=async()=>{
+ if(!canvas.captureStream||!window.MediaRecorder){alert('এই ব্রাউজারে Canvas recording সমর্থিত নয়। Chrome আপডেট করে চেষ্টা করো।');return;}
+ if(playing){playing=false;cancelAnimationFrame(raf);}
+ elapsed=0;update(0);chunks=[];
+ const stream=canvas.captureStream(30);
+ let mime=['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'].find(x=>MediaRecorder.isTypeSupported(x));
+ if(!mime){alert('এই ব্রাউজারে WebM recording সমর্থিত নয়।');return;}
+ recorder=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:5000000});
+ recorder.ondataavailable=e=>{if(e.data.size)chunks.push(e.data);};
+ recorder.onstop=()=>{let blob=new Blob(chunks,{type:mime}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='cinematic-tutorial-'+(document.querySelector('#ratio').value==='9/16'?'vertical':'landscape')+'.webm';a.click();setTimeout(()=>URL.revokeObjectURL(url),60000);document.querySelector('#status').textContent='Render saved as WebM. Add narration/music and convert to MP4 if needed.';};
+ recorder.start(1000);document.querySelector('#record').disabled=true;document.querySelector('#stop').disabled=false;document.querySelector('#status').textContent='Recording in real time: keep this tab open and screen awake for 6 minutes.';
+ playing=true;last=performance.now();raf=requestAnimationFrame(frame);
+ const poll=setInterval(()=>{if(!playing){clearInterval(poll);if(recorder&&recorder.state!=='inactive')recorder.stop();document.querySelector('#record').disabled=false;document.querySelector('#stop').disabled=true;}},500);
+ document.querySelector('#stop').onclick=()=>{playing=false;cancelAnimationFrame(raf);clearInterval(poll);if(recorder&&recorder.state!=='inactive')recorder.stop();document.querySelector('#record').disabled=false;document.querySelector('#stop').disabled=true;};
+};
+update(0);
+</script>
+</body></html>
