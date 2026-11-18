@@ -1,0 +1,1843 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PLAYNOVA — Virtual Demo Gaming Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-deep: #0b0518;
+      --bg-surface: #150b2e;
+      --bg-card: #1d103d;
+      --bg-card-hover: #26154f;
+      --purple-glow: #7c3aed;
+      --purple-soft: #a78bfa;
+      --gold-main: #fbbf24;
+      --gold-bright: #fde047;
+      --gold-dark: #d97706;
+      --text-main: #f8fafc;
+      --text-muted: #b8add9;
+      --border-glass: rgba(251, 191, 36, 0.18);
+      --border-purple: rgba(167, 139, 250, 0.2);
+      --success: #22c55e;
+      --danger: #ef4444;
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --shadow-gold: 0 8px 30px rgba(251, 191, 36, 0.18);
+      --shadow-purple: 0 12px 40px rgba(10, 4, 24, 0.65);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Outfit', system-ui, -apple-system, sans-serif;
+      background:
+        radial-gradient(circle at 15% 10%, rgba(124, 58, 237, 0.22), transparent 35%),
+        radial-gradient(circle at 85% 15%, rgba(251, 191, 36, 0.12), transparent 30%),
+        var(--bg-deep);
+      color: var(--text-main);
+      min-height: 100vh;
+      line-height: 1.5;
+      padding-bottom: 76px;
+    }
+
+    @media (min-width: 768px) {
+      body {
+        padding-bottom: 0;
+      }
+    }
+
+    button, input, select {
+      font-family: inherit;
+    }
+
+    /* Demo Disclaimer Ribbon */
+    .demo-banner {
+      background: linear-gradient(90deg, #2a1459, #431d7a, #2a1459);
+      border-bottom: 1px solid var(--border-glass);
+      color: var(--gold-bright);
+      text-align: center;
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 6px 12px;
+      letter-spacing: 0.03em;
+    }
+
+    /* Header */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: rgba(11, 5, 24, 0.86);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border-purple);
+    }
+
+    .nav-inner {
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .brand-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--gold-bright), var(--gold-dark));
+      display: grid;
+      place-items: center;
+      color: #160930;
+      font-weight: 800;
+      font-size: 1.2rem;
+      box-shadow: var(--shadow-gold);
+    }
+
+    .brand-text {
+      font-size: 1.45rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      background: linear-gradient(90deg, #fff, var(--gold-main));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .nav-links {
+      display: none;
+      align-items: center;
+      gap: 6px;
+    }
+
+    @media (min-width: 960px) {
+      .nav-links {
+        display: flex;
+      }
+    }
+
+    .nav-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 0.92rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .nav-btn:hover, .nav-btn.active {
+      color: var(--gold-bright);
+      background: rgba(124, 58, 237, 0.2);
+      border-color: var(--border-glass);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-left: auto;
+    }
+
+    .wallet-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, rgba(251, 191, 36, 0.16), rgba(124, 58, 237, 0.25));
+      border: 1px solid rgba(251, 191, 36, 0.45);
+      padding: 7px 14px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .wallet-pill:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-gold);
+    }
+
+    .coin-dot {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #fef08a, #d97706);
+      display: grid;
+      place-items: center;
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: #2c1000;
+    }
+
+    .wallet-balance {
+      font-weight: 700;
+      color: var(--gold-bright);
+      font-size: 0.95rem;
+    }
+
+    .btn-gold {
+      background: linear-gradient(135deg, var(--gold-bright), var(--gold-dark));
+      color: #1a0b33;
+      border: none;
+      padding: 9px 18px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: transform 0.15s ease, filter 0.15s ease;
+      box-shadow: var(--shadow-gold);
+    }
+
+    .btn-gold:hover {
+      filter: brightness(1.06);
+      transform: translateY(-1px);
+    }
+
+    .btn-gold:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-outline {
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-main);
+      border: 1px solid var(--border-purple);
+      padding: 9px 16px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-outline:hover {
+      border-color: var(--gold-main);
+      color: var(--gold-bright);
+    }
+
+    /* Main Container */
+    .container {
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 22px 18px 60px;
+    }
+
+    /* Hero */
+    .hero {
+      position: relative;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 85% 30%, rgba(251, 191, 36, 0.22), transparent 45%),
+        linear-gradient(135deg, #210e4a 0%, #14082e 55%, #2b125c 100%);
+      border: 1px solid var(--border-glass);
+      border-radius: 24px;
+      padding: 34px 28px;
+      margin-bottom: 28px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+      align-items: center;
+      box-shadow: var(--shadow-purple);
+    }
+
+    @media (min-width: 860px) {
+      .hero {
+        grid-template-columns: 1.35fr 0.85fr;
+        padding: 44px 42px;
+      }
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(251, 191, 36, 0.14);
+      border: 1px solid rgba(251, 191, 36, 0.35);
+      color: var(--gold-bright);
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin-bottom: 14px;
+    }
+
+    .hero h1 {
+      font-size: clamp(1.9rem, 4vw, 3rem);
+      font-weight: 800;
+      line-height: 1.12;
+      margin-bottom: 12px;
+    }
+
+    .hero h1 span {
+      color: var(--gold-main);
+    }
+
+    .hero p {
+      color: var(--text-muted);
+      max-width: 560px;
+      font-size: 1rem;
+      margin-bottom: 22px;
+    }
+
+    .hero-cta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .hero-stats-card {
+      background: rgba(11, 5, 24, 0.58);
+      border: 1px solid var(--border-purple);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      backdrop-filter: blur(10px);
+    }
+
+    .stat-box {
+      background: rgba(255, 255, 255, 0.03);
+      padding: 14px;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .stat-label {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .stat-value {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--gold-bright);
+      margin-top: 2px;
+    }
+
+    /* Search & Filter Toolbar */
+    .toolbar {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .search-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .search-box {
+      position: relative;
+      flex: 1 1 280px;
+      max-width: 480px;
+    }
+
+    .search-box input {
+      width: 100%;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-purple);
+      color: var(--text-main);
+      padding: 12px 16px 12px 42px;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .search-box input:focus {
+      border-color: var(--gold-main);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .categories-scroll {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      scrollbar-width: thin;
+    }
+
+    .cat-pill {
+      white-space: nowrap;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-purple);
+      color: var(--text-muted);
+      padding: 9px 16px;
+      border-radius: 999px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .cat-pill:hover {
+      border-color: var(--gold-main);
+      color: var(--text-main);
+    }
+
+    .cat-pill.active {
+      background: linear-gradient(135deg, var(--gold-bright), var(--gold-dark));
+      color: #1a0b33;
+      border-color: transparent;
+      font-weight: 700;
+    }
+
+    /* Section Headings */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      gap: 12px;
+    }
+
+    .section-title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Game Grid & Cards */
+    .games-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 18px;
+    }
+
+    .game-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-purple);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+      position: relative;
+    }
+
+    .game-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--gold-main);
+      box-shadow: 0 14px 32px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(251, 191, 36, 0.25);
+    }
+
+    .game-art {
+      height: 155px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      padding: 16px;
+    }
+
+    .game-art::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(29, 16, 61, 0.92), transparent 55%);
+    }
+
+    .game-emoji {
+      font-size: 3.7rem;
+      z-index: 1;
+      filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.5));
+      transition: transform 0.25s ease;
+    }
+
+    .game-card:hover .game-emoji {
+      transform: scale(1.1) rotate(-3deg);
+    }
+
+    .provider-tag {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 2;
+      background: rgba(11, 5, 24, 0.78);
+      border: 1px solid rgba(251, 191, 36, 0.35);
+      color: var(--gold-bright);
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 999px;
+      letter-spacing: 0.04em;
+    }
+
+    .fav-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 2;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(11, 5, 24, 0.75);
+      color: #cbd5e1;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: all 0.2s;
+    }
+
+    .fav-btn.active {
+      color: #fb7185;
+      border-color: #fb7185;
+      background: rgba(251, 113, 133, 0.15);
+    }
+
+    .featured-ribbon {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      z-index: 2;
+      background: linear-gradient(90deg, #f59e0b, #fde047);
+      color: #1f0a3d;
+      font-size: 0.68rem;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+    }
+
+    .game-body {
+      padding: 14px 16px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex: 1;
+    }
+
+    .game-title {
+      font-size: 1.03rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .game-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .play-btn {
+      margin-top: auto;
+      width: 100%;
+      padding: 10px;
+      border-radius: 10px;
+      border: none;
+      background: linear-gradient(135deg, #6d28d9, #9333ea);
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .game-card:hover .play-btn {
+      background: linear-gradient(135deg, var(--gold-bright), var(--gold-dark));
+      color: #1a0b33;
+    }
+
+    /* Views (Leaderboard & Admin) */
+    .panel-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-purple);
+      border-radius: var(--radius-lg);
+      padding: 22px;
+      margin-bottom: 22px;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 540px;
+    }
+
+    th, td {
+      padding: 12px 14px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+      font-size: 0.92rem;
+    }
+
+    th {
+      color: var(--gold-main);
+      font-weight: 700;
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    tr.highlight-row {
+      background: rgba(251, 191, 36, 0.09);
+    }
+
+    .rank-badge {
+      display: inline-grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      font-weight: 800;
+      font-size: 0.85rem;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .rank-1 { background: linear-gradient(135deg, #fde047, #d97706); color: #1a0b33; }
+    .rank-2 { background: linear-gradient(135deg, #e2e8f0, #94a3b8); color: #0f172a; }
+    .rank-3 { background: linear-gradient(135deg, #fdba74, #c2410c); color: #1c0a00; }
+
+    /* Admin Grid */
+    .admin-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+
+    @media (min-width: 960px) {
+      .admin-grid {
+        grid-template-columns: 360px 1fr;
+      }
+    }
+
+    .form-group {
+      margin-bottom: 13px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.83rem;
+      color: var(--text-muted);
+      margin-bottom: 5px;
+      font-weight: 600;
+    }
+
+    .form-group input, .form-group select {
+      width: 100%;
+      background: var(--bg-deep);
+      border: 1px solid var(--border-purple);
+      color: var(--text-main);
+      padding: 10px 12px;
+      border-radius: 10px;
+      outline: none;
+    }
+
+    .form-group input:focus, .form-group select:focus {
+      border-color: var(--gold-main);
+    }
+
+    /* Modals */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      background: rgba(7, 3, 16, 0.82);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal {
+      width: 100%;
+      max-width: 480px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-glass);
+      border-radius: 22px;
+      padding: 24px;
+      box-shadow: var(--shadow-purple);
+      max-height: 92vh;
+      overflow-y: auto;
+      position: relative;
+    }
+
+    .modal.modal-wide {
+      max-width: 720px;
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+
+    .modal-close {
+      background: rgba(255, 255, 255, 0.08);
+      border: none;
+      color: #fff;
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+
+    /* Demo Game Stage */
+    .game-stage {
+      background: radial-gradient(circle at top, #2c165e, #120729);
+      border: 1px solid var(--border-glass);
+      border-radius: 18px;
+      padding: 22px;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    .reels-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      max-width: 360px;
+      margin: 14px auto;
+    }
+
+    .reel-box {
+      background: rgba(11, 5, 24, 0.8);
+      border: 2px solid rgba(251, 191, 36, 0.35);
+      border-radius: 14px;
+      height: 92px;
+      display: grid;
+      place-items: center;
+      font-size: 2.7rem;
+      box-shadow: inset 0 0 18px rgba(124, 58, 237, 0.35);
+    }
+
+    .reel-box.spinning {
+      animation: pulseSpin 0.25s infinite alternate;
+    }
+
+    @keyframes pulseSpin {
+      from { transform: scale(0.95); border-color: var(--purple-glow); }
+      to { transform: scale(1.04); border-color: var(--gold-bright); }
+    }
+
+    .crash-display {
+      font-size: 3rem;
+      font-weight: 800;
+      color: var(--gold-bright);
+      margin: 14px 0;
+      text-shadow: 0 0 24px rgba(251, 191, 36, 0.4);
+    }
+
+    .arcade-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      max-width: 340px;
+      margin: 16px auto;
+    }
+
+    .arcade-target {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-glass);
+      border-radius: 14px;
+      padding: 18px 8px;
+      font-size: 2rem;
+      cursor: pointer;
+      transition: transform 0.15s, background 0.15s;
+    }
+
+    .arcade-target:hover:not(:disabled) {
+      transform: scale(1.06);
+      background: rgba(251, 191, 36, 0.15);
+    }
+
+    .bet-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .bet-chip {
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid var(--border-purple);
+      color: #fff;
+      padding: 7px 14px;
+      border-radius: 999px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .bet-chip.active {
+      background: var(--gold-main);
+      color: #1a0b33;
+      border-color: transparent;
+    }
+
+    .result-banner {
+      min-height: 28px;
+      font-weight: 700;
+      margin-top: 10px;
+      font-size: 1rem;
+    }
+
+    /* Mobile Bottom Nav */
+    .mobile-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 45;
+      background: rgba(15, 7, 32, 0.96);
+      backdrop-filter: blur(12px);
+      border-top: 1px solid var(--border-purple);
+      display: flex;
+      justify-content: space-around;
+      padding: 8px 6px;
+    }
+
+    @media (min-width: 960px) {
+      .mobile-nav {
+        display: none;
+      }
+    }
+
+    .mobile-nav-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.72rem;
+      font-weight: 600;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      cursor: pointer;
+    }
+
+    .mobile-nav-btn.active {
+      color: var(--gold-bright);
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 84px;
+      right: 18px;
+      z-index: 100;
+      background: #1d103d;
+      border: 1px solid var(--gold-main);
+      color: #fff;
+      padding: 12px 18px;
+      border-radius: 12px;
+      box-shadow: var(--shadow-purple);
+      font-weight: 600;
+      font-size: 0.9rem;
+      opacity: 0;
+      transform: translateY(12px);
+      pointer-events: none;
+      transition: all 0.25s ease;
+    }
+
+    @media (min-width: 960px) {
+      .toast {
+        bottom: 24px;
+      }
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .tag-btn {
+      padding: 5px 10px;
+      font-size: 0.78rem;
+      border-radius: 8px;
+      cursor: pointer;
+      border: 1px solid var(--border-purple);
+      background: rgba(255,255,255,0.05);
+      color: #fff;
+    }
+
+    .tag-btn.danger {
+      border-color: rgba(239, 68, 68, 0.5);
+      color: #fca5a5;
+    }
+  </style>
+</head>
+<body>
+  <div class="demo-banner">
+    PLAYNOVA VIRTUAL DEMO ARCADE • 100% Virtual Coins Only • No Real-Money Gambling, Deposits, or Withdrawals
+  </div>
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <div class="nav-inner">
+      <div class="brand" onclick="switchView('home')">
+        <div class="brand-icon">PN</div>
+        <div class="brand-text">PLAYNOVA</div>
+      </div>
+
+      <nav class="nav-links" id="desktopNav">
+        <button class="nav-btn active" data-view="home" onclick="switchView('home')">Home</button>
+        <button class="nav-btn" data-view="favorites" onclick="switchView('favorites')">Favorites</button>
+        <button class="nav-btn" data-view="leaderboard" onclick="switchView('leaderboard')">Leaderboard</button>
+        <button class="nav-btn hidden" id="adminNavBtn" data-view="admin" onclick="switchView('admin')">Admin Dashboard</button>
+      </nav>
+
+      <div class="nav-actions">
+        <div class="wallet-pill" onclick="openWalletModal()" title="Open Demo Wallet">
+          <div class="coin-dot">C</div>
+          <span class="wallet-balance" id="headerBalance">10,000</span>
+        </div>
+        <button class="btn-gold" id="authBtn" onclick="openAuthModal()">Sign In</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- HOME / FAVORITES VIEW -->
+    <section id="homeView">
+      <div class="hero" id="heroBanner">
+        <div>
+          <div class="hero-badge">✨ PG & JILI INSPIRED DEMO COLLECTION</div>
+          <h1>Spin, Crash & Play with <span>Virtual Demo Coins</span></h1>
+          <p>
+            Explore sleek mobile-ready demo slots, ocean arcade shooters, and instant multiplier games in a safe, zero-risk virtual playground.
+          </p>
+          <div class="hero-cta">
+            <button class="btn-gold" onclick="claimDailyBonus()">🎁 Claim +1,000 Demo Coins</button>
+            <button class="btn-outline" onclick="switchView('leaderboard')">🏆 View Leaderboard</button>
+          </div>
+        </div>
+        <div class="hero-stats-card">
+          <div class="stat-box">
+            <div class="stat-label">Demo Games</div>
+            <div class="stat-value" id="statTotalGames">12</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">Your Wallet</div>
+            <div class="stat-value" id="statWallet">10,000</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">Favorites</div>
+            <div class="stat-value" id="statFavorites">0</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">Demo Spins</div>
+            <div class="stat-value" id="statSpins">0</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Search & Categories -->
+      <div class="toolbar">
+        <div class="search-row">
+          <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" placeholder="Search games, PG style, JILI arcade..." oninput="renderGames()" />
+          </div>
+          <div style="font-size: 0.86rem; color: var(--text-muted);" id="resultsCount">Showing all games</div>
+        </div>
+
+        <div class="categories-scroll" id="categoryBar">
+          <button class="cat-pill active" onclick="setCategory('All', this)">All Games</button>
+          <button class="cat-pill" onclick="setCategory('PG Style Slots', this)">PG Style Slots</button>
+          <button class="cat-pill" onclick="setCategory('JILI Fishing & Arcade', this)">JILI Fishing & Arcade</button>
+          <button class="cat-pill" onclick="setCategory('Crash & Instant', this)">Crash & Instant</button>
+          <button class="cat-pill" onclick="setCategory('Table & Cards', this)">Table & Cards</button>
+          <button class="cat-pill" onclick="setCategory('Bonus Buy', this)">Bonus Buy</button>
+        </div>
+      </div>
+
+      <div class="section-header">
+        <h2 class="section-title" id="gamesHeading">🔥 Featured & Popular Demo Games</h2>
+      </div>
+
+      <div class="games-grid" id="gamesGrid"></div>
+    </section>
+
+    <!-- LEADERBOARD VIEW -->
+    <section id="leaderboardView" class="hidden">
+      <div class="panel-card">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">🏆 PLAYNOVA Virtual Coins Leaderboard</h2>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Top demo players ranked by Virtual Coin balance</p>
+          </div>
+          <button class="btn-outline" onclick="switchView('home')">← Back to Games</button>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Player</th>
+                <th>Status</th>
+                <th>Total Demo Plays</th>
+                <th>Virtual Coins</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboardBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ADMIN VIEW -->
+    <section id="adminView" class="hidden">
+      <div class="section-header">
+        <h2 class="section-title">🛡️ Admin Dashboard — Manage Demo Games</h2>
+        <button class="btn-outline" onclick="switchView('home')">← Back to Lobby</button>
+      </div>
+
+      <div class="admin-grid">
+        <div class="panel-card">
+          <h3 style="margin-bottom: 14px; color: var(--gold-bright);">Add New Demo Game</h3>
+          <form onsubmit="handleAddGame(event)">
+            <div class="form-group">
+              <label>Game Title</label>
+              <input type="text" id="newGameTitle" required placeholder="e.g., Golden Dragon Ways" />
+            </div>
+            <div class="form-group">
+              <label>Category (PG / JILI Inspired)</label>
+              <select id="newGameCategory">
+                <option value="PG Style Slots">PG Style Slots</option>
+                <option value="JILI Fishing & Arcade">JILI Fishing & Arcade</option>
+                <option value="Crash & Instant">Crash & Instant</option>
+                <option value="Table & Cards">Table & Cards</option>
+                <option value="Bonus Buy">Bonus Buy</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Studio Style Badge</label>
+              <select id="newGameProvider">
+                <option value="NovaPG">NovaPG</option>
+                <option value="NovaJILI">NovaJILI</option>
+                <option value="NovaOriginals">NovaOriginals</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Demo Engine Type</label>
+              <select id="newGameEngine">
+                <option value="slot">3-Reel Slot Demo</option>
+                <option value="crash">Crash Multiplier Demo</option>
+                <option value="arcade">Arcade Chest Hunt Demo</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Emoji Icon</label>
+              <input type="text" id="newGameEmoji" value="🐉" maxlength="4" required />
+            </div>
+            <div class="form-group">
+              <label>Demo RTP Label</label>
+              <input type="text" id="newGameRtp" value="96.8% Demo" required />
+            </div>
+            <button type="submit" class="btn-gold" style="width: 100%;">+ Add Game to Lobby</button>
+          </form>
+        </div>
+
+        <div class="panel-card">
+          <h3 style="margin-bottom: 14px; color: var(--gold-bright);">Catalog Management</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Game</th>
+                  <th>Category</th>
+                  <th>Engine</th>
+                  <th>Featured</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="adminGamesTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Mobile Bottom Nav -->
+  <nav class="mobile-nav">
+    <button class="mobile-nav-btn active" data-view="home" onclick="switchView('home')">
+      <span>🏠</span><span>Home</span>
+    </button>
+    <button class="mobile-nav-btn" data-view="favorites" onclick="switchView('favorites')">
+      <span>❤️</span><span>Favorites</span>
+    </button>
+    <button class="mobile-nav-btn" data-view="leaderboard" onclick="switchView('leaderboard')">
+      <span>🏆</span><span>Ranks</span>
+    </button>
+    <button class="mobile-nav-btn hidden" id="mobileAdminBtn" data-view="admin" onclick="switchView('admin')">
+      <span>🛡️</span><span>Admin</span>
+    </button>
+  </nav>
+
+  <!-- AUTH MODAL -->
+  <div class="modal-backdrop" id="authModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="authTitle">Welcome to PLAYNOVA</h3>
+        <button class="modal-close" onclick="closeModal('authModal')">×</button>
+      </div>
+
+      <div id="loggedOutSection">
+        <div style="display:flex; gap:8px; margin-bottom:16px;">
+          <button class="cat-pill active" id="tabLogin" onclick="toggleAuthMode('login')" style="flex:1;">Sign In</button>
+          <button class="cat-pill" id="tabRegister" onclick="toggleAuthMode('register')" style="flex:1;">Create Account</button>
+        </div>
+
+        <form onsubmit="handleAuthSubmit(event)">
+          <div class="form-group hidden" id="nameGroup">
+            <label>Player Name</label>
+            <input type="text" id="authName" placeholder="NovaChamp" />
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="authEmail" required placeholder="player@playnova.demo" />
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="authPassword" required placeholder="••••••••" />
+          </div>
+          <button type="submit" class="btn-gold" style="width:100%;" id="authSubmitBtn">Sign In</button>
+        </form>
+
+        <div style="margin-top:16px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.1);">
+          <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:8px;">Quick Demo Logins:</div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button class="btn-outline" style="flex:1; font-size:0.8rem;" onclick="quickLogin('player@playnova.demo','player123')">Demo Player</button>
+            <button class="btn-outline" style="flex:1; font-size:0.8rem;" onclick="quickLogin('admin@playnova.demo','admin123')">Demo Admin</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="loggedInSection" class="hidden">
+        <p style="color:var(--text-muted); margin-bottom:14px;">
+          Signed in as <strong style="color:var(--gold-bright);" id="profileName"></strong>
+          (<span id="profileRole"></span>)
+        </p>
+        <div style="display:flex; gap:10px;">
+          <button class="btn-outline" style="flex:1;" onclick="closeModal('authModal')">Continue Playing</button>
+          <button class="btn-gold" style="flex:1;" onclick="logoutUser()">Sign Out</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WALLET MODAL -->
+  <div class="modal-backdrop" id="walletModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>🪙 Virtual Demo Wallet</h3>
+        <button class="modal-close" onclick="closeModal('walletModal')">×</button>
+      </div>
+      <div class="panel-card" style="text-align:center; margin-bottom:14px;">
+        <div style="font-size:0.84rem; color:var(--text-muted);">Available Demo Balance</div>
+        <div style="font-size:2.3rem; font-weight:800; color:var(--gold-bright);" id="walletModalBalance">10,000</div>
+        <div style="font-size:0.76rem; color:var(--purple-soft); margin-top:4px;">Virtual Coins have zero monetary value</div>
+      </div>
+      <button class="btn-gold" style="width:100%; margin-bottom:16px;" onclick="refillCoins()">+ Refill 5,000 Free Demo Coins</button>
+      <div style="font-weight:700; font-size:0.9rem; margin-bottom:8px;">Recent Demo Activity</div>
+      <div id="walletHistory" style="max-height:180px; overflow-y:auto; font-size:0.84rem; color:var(--text-muted);"></div>
+    </div>
+  </div>
+
+  <!-- GAME PLAYER MODAL -->
+  <div class="modal-backdrop" id="gameModal">
+    <div class="modal modal-wide">
+      <div class="modal-header">
+        <div>
+          <h3 id="modalGameTitle">Game Title</h3>
+          <div style="font-size:0.82rem; color:var(--text-muted);" id="modalGameSub">NovaPG • Demo Mode</div>
+        </div>
+        <button class="modal-close" onclick="closeGameModal()">×</button>
+      </div>
+
+      <div class="game-stage" id="gameStage"></div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <div>
+          <span style="color:var(--text-muted); font-size:0.85rem;">Demo Bet:</span>
+          <strong style="color:var(--gold-bright);" id="currentBetLabel">100</strong> Coins
+        </div>
+        <div class="bet-controls" style="margin-top:0;">
+          <button class="bet-chip active" onclick="setBet(100, this)">100</button>
+          <button class="bet-chip" onclick="setBet(250, this)">250</button>
+          <button class="bet-chip" onclick="setBet(500, this)">500</button>
+          <button class="bet-chip" onclick="setBet(1000, this)">1,000</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ---------- SEED DATA ----------
+    const DEFAULT_GAMES = [
+      { id: 'g1', title: 'Fortune Tiger Nova', category: 'PG Style Slots', provider: 'NovaPG', engine: 'slot', emoji: '🐯', rtp: '96.8% Demo', gradient: 'linear-gradient(135deg, #4c1d95, #b45309)', featured: true },
+      { id: 'g2', title: 'Mahjong Gold Ways', category: 'PG Style Slots', provider: 'NovaPG', engine: 'slot', emoji: '🀄', rtp: '96.9% Demo', gradient: 'linear-gradient(135deg, #312e81, #047857)', featured: true },
+      { id: 'g3', title: 'Royal Fishing Arena', category: 'JILI Fishing & Arcade', provider: 'NovaJILI', engine: 'arcade', emoji: '🐠', rtp: '97.1% Demo', gradient: 'linear-gradient(135deg, #1e3a8a, #7c3aed)', featured: true },
+      { id: 'g4', title: 'Nova Rocket Crash', category: 'Crash & Instant', provider: 'NovaOriginals', engine: 'crash', emoji: '🚀', rtp: '97.0% Demo', gradient: 'linear-gradient(135deg, #581c87, #be185d)', featured: true },
+      { id: 'g5', title: 'Treasure of Aztec', category: 'PG Style Slots', provider: 'NovaPG', engine: 'slot', emoji: '🗿', rtp: '96.7% Demo', gradient: 'linear-gradient(135deg, #3b0764, #ca8a04)', featured: false },
+      { id: 'g6', title: 'Super Ace Cards', category: 'Table & Cards', provider: 'NovaJILI', engine: 'slot', emoji: '🃏', rtp: '97.0% Demo', gradient: 'linear-gradient(135deg, #1e1b4b, #9f1239)', featured: true },
+      { id: 'g7', title: 'Ocean King Jackpot', category: 'JILI Fishing & Arcade', provider: 'NovaJILI', engine: 'arcade', emoji: '🐙', rtp: '96.5% Demo', gradient: 'linear-gradient(135deg, #0f172a, #0284c7)', featured: false },
+      { id: 'g8', title: 'Lucky Neko Shrine', category: 'Bonus Buy', provider: 'NovaPG', engine: 'slot', emoji: '🐱', rtp: '96.7% Demo', gradient: 'linear-gradient(135deg, #4a044e, #db2777)', featured: false },
+      { id: 'g9', title: 'Dragon Multiplier X', category: 'Crash & Instant', provider: 'NovaOriginals', engine: 'crash', emoji: '🐉', rtp: '97.2% Demo', gradient: 'linear-gradient(135deg, #3b0764, #dc2626)', featured: false },
+      { id: 'g10', title: 'Candy Bonanza Spin', category: 'Bonus Buy', provider: 'NovaPG', engine: 'slot', emoji: '🍭', rtp: '96.6% Demo', gradient: 'linear-gradient(135deg, #701a75, #ec4899)', featured: false },
+      { id: 'g11', title: 'Boxing King Arcade', category: 'JILI Fishing & Arcade', provider: 'NovaJILI', engine: 'arcade', emoji: '🥊', rtp: '96.8% Demo', gradient: 'linear-gradient(135deg, #450a0a, #b91c1c)', featured: false },
+      { id: 'g12', title: 'Imperial Baccarat Demo', category: 'Table & Cards', provider: 'NovaOriginals', engine: 'slot', emoji: '👑', rtp: '97.5% Demo', gradient: 'linear-gradient(135deg, #2e1065, #a16207)', featured: false }
+    ];
+
+    const DEFAULT_USERS = [
+      { id: 'u_admin', name: 'NovaAdmin', email: 'admin@playnova.demo', password: 'admin123', role: 'admin', coins: 25000, spins: 42, favorites: ['g1', 'g4'] },
+      { id: 'u_player', name: 'AidenStar', email: 'player@playnova.demo', password: 'player123', role: 'player', coins: 12500, spins: 18, favorites: ['g1', 'g3'] },
+      { id: 'u_bot1', name: 'GoldenKitsune', email: 'bot1@demo', password: 'x', role: 'player', coins: 48200, spins: 155, favorites: [] },
+      { id: 'u_bot2', name: 'PurpleAce99', email: 'bot2@demo', password: 'x', role: 'player', coins: 34900, spins: 110, favorites: [] },
+      { id: 'u_bot3', name: 'JiliHunter', email: 'bot3@demo', password: 'x', role: 'player', coins: 21750, spins: 74, favorites: [] }
+    ];
+
+    // ---------- STATE & STORAGE ----------
+    const STORE_KEYS = {
+      games: 'playnova_games_v1',
+      users: 'playnova_users_v1',
+      session: 'playnova_session_v1',
+      guestWallet: 'playnova_guest_v1',
+      history: 'playnova_history_v1'
+    };
+
+    let games = JSON.parse(localStorage.getItem(STORE_KEYS.games)) || DEFAULT_GAMES;
+    let users = JSON.parse(localStorage.getItem(STORE_KEYS.users)) || DEFAULT_USERS;
+    let currentUserId = localStorage.getItem(STORE_KEYS.session) || null;
+    let guestState = JSON.parse(localStorage.getItem(STORE_KEYS.guestWallet)) || { coins: 10000, spins: 0, favorites: [] };
+    let historyLog = JSON.parse(localStorage.getItem(STORE_KEYS.history)) || ['Welcome to PLAYNOVA! +10,000 Virtual Demo Coins granted.'];
+
+    let activeView = 'home';
+    let activeCategory = 'All';
+    let authMode = 'login';
+    let currentBet = 100;
+    let activeGame = null;
+
+    // Crash state
+    let crashTimer = null;
+    let crashActive = false;
+    let crashMultiplier = 1.00;
+    let crashTarget = 2.00;
+
+    function saveAll() {
+      localStorage.setItem(STORE_KEYS.games, JSON.stringify(games));
+      localStorage.setItem(STORE_KEYS.users, JSON.stringify(users));
+      localStorage.setItem(STORE_KEYS.guestWallet, JSON.stringify(guestState));
+      localStorage.setItem(STORE_KEYS.history, JSON.stringify(historyLog.slice(0, 25)));
+      if (currentUserId) localStorage.setItem(STORE_KEYS.session, currentUserId);
+      else localStorage.removeItem(STORE_KEYS.session);
+    }
+
+    function getCurrentAccount() {
+      return currentUserId ? users.find(u => u.id === currentUserId) || null : null;
+    }
+
+    function getWallet() {
+      return getCurrentAccount() || guestState;
+    }
+
+    function escapeHtml(str) {
+      return String(str).replace(/[&<>"']/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
+    }
+
+    function showToast(msg) {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      clearTimeout(el._t);
+      el._t = setTimeout(() => el.classList.remove('show'), 2800);
+    }
+
+    function addLog(text) {
+      historyLog.unshift(`${new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})} — ${text}`);
+      historyLog = historyLog.slice(0, 20);
+    }
+
+    // ---------- UI UPDATES ----------
+    function updateHeaderAndStats() {
+      const user = getCurrentAccount();
+      const wallet = getWallet();
+
+      document.getElementById('headerBalance').textContent = wallet.coins.toLocaleString();
+      document.getElementById('walletModalBalance').textContent = wallet.coins.toLocaleString();
+      document.getElementById('statTotalGames').textContent = games.length;
+      document.getElementById('statWallet').textContent = wallet.coins.toLocaleString();
+      document.getElementById('statFavorites').textContent = wallet.favorites.length;
+      document.getElementById('statSpins').textContent = wallet.spins;
+
+      const authBtn = document.getElementById('authBtn');
+      const isAdmin = user && user.role === 'admin';
+      document.getElementById('adminNavBtn').classList.toggle('hidden', !isAdmin);
+      document.getElementById('mobileAdminBtn').classList.toggle('hidden', !isAdmin);
+
+      if (user) {
+        authBtn.textContent = user.name;
+      } else {
+        authBtn.textContent = 'Sign In';
+      }
+    }
+
+    function switchView(view) {
+      activeView = view;
+      document.getElementById('homeView').classList.toggle('hidden', view !== 'home' && view !== 'favorites');
+      document.getElementById('leaderboardView').classList.toggle('hidden', view !== 'leaderboard');
+      document.getElementById('adminView').classList.toggle('hidden', view !== 'admin');
+      document.getElementById('heroBanner').classList.toggle('hidden', view === 'favorites');
+
+      document.querySelectorAll('.nav-btn, .mobile-nav-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.view === view);
+      });
+
+      if (view === 'favorites') {
+        document.getElementById('gamesHeading').textContent = '❤️ Your Favorite Demo Games';
+        renderGames();
+      } else if (view === 'home') {
+        document.getElementById('gamesHeading').textContent = '🔥 Featured & Popular Demo Games';
+        renderGames();
+      } else if (view === 'leaderboard') {
+        renderLeaderboard();
+      } else if (view === 'admin') {
+        renderAdminTable();
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function setCategory(cat, btn) {
+      activeCategory = cat;
+      document.querySelectorAll('#categoryBar .cat-pill').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderGames();
+    }
+
+    function renderGames() {
+      const query = document.getElementById('searchInput').value.trim().toLowerCase();
+      const wallet = getWallet();
+
+      const filtered = games.filter(g => {
+        if (activeView === 'favorites' && !wallet.favorites.includes(g.id)) return false;
+        if (activeCategory !== 'All' && g.category !== activeCategory) return false;
+        if (query && !(`${g.title} ${g.provider} ${g.category}`.toLowerCase().includes(query))) return false;
+        return true;
+      });
+
+      document.getElementById('resultsCount').textContent = `Showing ${filtered.length} game${filtered.length === 1 ? '' : 's'}`;
+      const grid = document.getElementById('gamesGrid');
+
+      if (!filtered.length) {
+        grid.innerHTML = `<div class="panel-card" style="grid-column: 1 / -1; text-align:center; color:var(--text-muted);">No matching demo games found. Try another category or search term!</div>`;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(g => {
+        const isFav = wallet.favorites.includes(g.id);
+        return `
+          <article class="game-card">
+            <div class="game-art" style="background: ${g.gradient};">
+              <span class="provider-tag">${escapeHtml(g.provider)}</span>
+              <button class="fav-btn ${isFav ? 'active' : ''}" onclick="toggleFavorite('${g.id}', event)" title="Favorite">
+                ${isFav ? '♥' : '♡'}
+              </button>
+              ${g.featured ? '<span class="featured-ribbon">Hot Demo</span>' : ''}
+              <div class="game-emoji">${escapeHtml(g.emoji)}</div>
+            </div>
+            <div class="game-body">
+              <div class="game-title">${escapeHtml(g.title)}</div>
+              <div class="game-meta">
+                <span>${escapeHtml(g.category)}</span>
+                <span style="color:var(--gold-main);">${escapeHtml(g.rtp)}</span>
+              </div>
+              <button class="play-btn" onclick="openGameModal('${g.id}')">▶ Play Demo</button>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    function toggleFavorite(gameId, e) {
+      e.stopPropagation();
+      const wallet = getWallet();
+      const idx = wallet.favorites.indexOf(gameId);
+      if (idx > -1) {
+        wallet.favorites.splice(idx, 1);
+        showToast('Removed from Favorites');
+      } else {
+        wallet.favorites.push(gameId);
+        showToast('Added to Favorites ❤️');
+      }
+      saveAll();
+      updateHeaderAndStats();
+      renderGames();
+    }
+
+    // ---------- AUTH ----------
+    function openAuthModal() {
+      const user = getCurrentAccount();
+      document.getElementById('loggedOutSection').classList.toggle('hidden', !!user);
+      document.getElementById('loggedInSection').classList.toggle('hidden', !user);
+      if (user) {
+        document.getElementById('authTitle').textContent = 'Player Profile';
+        document.getElementById('profileName').textContent = user.name;
+        document.getElementById('profileRole').textContent = user.role === 'admin' ? 'Admin' : 'Demo Player';
+      } else {
+        document.getElementById('authTitle').textContent = 'Welcome to PLAYNOVA';
+      }
+      document.getElementById('authModal').classList.add('open');
+    }
+
+    function toggleAuthMode(mode) {
+      authMode = mode;
+      document.getElementById('tabLogin').classList.toggle('active', mode === 'login');
+      document.getElementById('tabRegister').classList.toggle('active', mode === 'register');
+      document.getElementById('nameGroup').classList.toggle('hidden', mode === 'login');
+      document.getElementById('authSubmitBtn').textContent = mode === 'login' ? 'Sign In' : 'Create Demo Account';
+    }
+
+    function handleAuthSubmit(e) {
+      e.preventDefault();
+      const email = document.getElementById('authEmail').value.trim().toLowerCase();
+      const password = document.getElementById('authPassword').value;
+      const name = document.getElementById('authName').value.trim();
+
+      if (authMode === 'login') {
+        const user = users.find(u => u.email.toLowerCase() === email && u.password === password);
+        if (!user) return showToast('Invalid email or password');
+        currentUserId = user.id;
+        showToast(`Welcome back, ${user.name}!`);
+      } else {
+        if (!name) return showToast('Please enter a player name');
+        if (users.some(u => u.email.toLowerCase() === email)) return showToast('Email already registered');
+        const newUser = {
+          id: 'u_' + Date.now(),
+          name,
+          email,
+          password,
+          role: 'player',
+          coins: 10000,
+          spins: 0,
+          favorites: []
+        };
+        users.push(newUser);
+        currentUserId = newUser.id;
+        addLog(`Created account ${name} with 10,000 Demo Coins.`);
+        showToast(`Account created! +10,000 Demo Coins 🪙`);
+      }
+
+      saveAll();
+      updateHeaderAndStats();
+      renderGames();
+      closeModal('authModal');
+    }
+
+    function quickLogin(email, pass) {
+      toggleAuthMode('login');
+      document.getElementById('authEmail').value = email;
+      document.getElementById('authPassword').value = pass;
+      const user = users.find(u => u.email === email && u.password === pass);
+      if (user) {
+        currentUserId = user.id;
+        saveAll();
+        updateHeaderAndStats();
+        renderGames();
+        closeModal('authModal');
+        showToast(`Signed in as ${user.name}`);
+      }
+    }
+
+    function logoutUser() {
+      currentUserId = null;
+      saveAll();
+      updateHeaderAndStats();
+      if (activeView === 'admin') switchView('home');
+      renderGames();
+      closeModal('authModal');
+      showToast('Signed out');
+    }
+
+    // ---------- WALLET ----------
+    function openWalletModal() {
+      updateHeaderAndStats();
+      const el = document.getElementById('walletHistory');
+      el.innerHTML = historyLog.map(item => `<div style="padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.06);">${escapeHtml(item)}</div>`).join('');
+      document.getElementById('walletModal').classList.add('open');
+    }
+
+    function claimDailyBonus() {
+      const wallet = getWallet();
+      wallet.coins += 1000;
+      addLog('Claimed Daily Demo Bonus (+1,000 Coins)');
+      saveAll();
+      updateHeaderAndStats();
+      showToast('🎁 +1,000 Virtual Demo Coins added!');
+    }
+
+    function refillCoins() {
+      const wallet = getWallet();
+      wallet.coins += 5000;
+      addLog('Refilled Virtual Wallet (+5,000 Coins)');
+      saveAll();
+      updateHeaderAndStats();
+      openWalletModal();
+      showToast('🪙 +5,000 Virtual Demo Coins added!');
+    }
+
+    // ---------- LEADERBOARD ----------
+    function renderLeaderboard() {
+      const current = getCurrentAccount();
+      const sorted = [...users].sort((a, b) => b.coins - a.coins);
+      const tbody = document.getElementById('leaderboardBody');
+      tbody.innerHTML = sorted.map((u, idx) => {
+        const rank = idx + 1;
+        const rankClass = rank <= 3 ? `rank-${rank}` : '';
+        const isMe = current && current.id === u.id;
+        return `
+          <tr class="${isMe ? 'highlight-row' : ''}">
+            <td><span class="rank-badge ${rankClass}">${rank}</span></td>
+            <td><strong>${escapeHtml(u.name)}</strong> ${isMe ? '(You)' : ''}</td>
+            <td>${u.role === 'admin' ? 'Admin' : 'Player'}</td>
+            <td>${u.spins}</td>
+            <td style="color:var(--gold-bright); font-weight:700;">${u.coins.toLocaleString()} 🪙</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // ---------- ADMIN DASHBOARD ----------
+    function renderAdminTable() {
+      const tbody = document.getElementById('adminGamesTable');
+      tbody.innerHTML = games.map(g => `
+        <tr>
+          <td>${escapeHtml(g.emoji)} <strong>${escapeHtml(g.title)}</strong></td>
+          <td>${escapeHtml(g.category)}</td>
+          <td>${escapeHtml(g.engine)}</td>
+          <td>
+            <button class="tag-btn" onclick="toggleFeature('${g.id}')">${g.featured ? '⭐ Featured' : 'Standard'}</button>
+          </td>
+          <td>
+            <button class="tag-btn danger" onclick="deleteGame('${g.id}')">Delete</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function handleAddGame(e) {
+      e.preventDefault();
+      const title = document.getElementById('newGameTitle').value.trim();
+      const category = document.getElementById('newGameCategory').value;
+      const provider = document.getElementById('newGameProvider').value;
+      const engine = document.getElementById('newGameEngine').value;
+      const emoji = document.getElementById('newGameEmoji').value.trim() || '🎮';
+      const rtp = document.getElementById('newGameRtp').value.trim();
+
+      const gradients = [
+        'linear-gradient(135deg, #4c1d95, #d97706)',
+        'linear-gradient(135deg, #312e81, #9333ea)',
+        'linear-gradient(135deg, #581c87, #0284c7)'
+      ];
+
+      games.unshift({
+        id: 'g_' + Date.now(),
+        title,
+        category,
+        provider,
+        engine,
+        emoji,
+        rtp,
+        gradient: gradients[Math.floor(Math.random() * gradients.length)],
+        featured: true
+      });
+
+      e.target.reset();
+      saveAll();
+      updateHeaderAndStats();
+      renderAdminTable();
+      showToast(`Added "${title}" to PLAYNOVA!`);
+    }
+
+    function toggleFeature(id) {
+      const g = games.find(x => x.id === id);
+      if (g) {
+        g.featured = !g.featured;
+        saveAll();
+        renderAdminTable();
+        showToast('Updated featured status');
+      }
+    }
+
+    function deleteGame(id) {
+      games = games.filter(g => g.id !== id);
+      saveAll();
+      updateHeaderAndStats();
+      renderAdminTable();
+      showToast('Game removed');
+    }
+
+    // ---------- PLAYABLE DEMO GAMES ENGINE ----------
+    function setBet(val, btn) {
+      currentBet = val;
+      document.getElementById('currentBetLabel').textContent = val.toLocaleString();
+      document.querySelectorAll('.bet-chip').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+
+    function openGameModal(gameId) {
+      activeGame = games.find(g => g.id === gameId);
+      if (!activeGame) return;
+
+      document.getElementById('modalGameTitle').textContent = `${activeGame.emoji} ${activeGame.title}`;
+      document.getElementById('modalGameSub').textContent = `${activeGame.provider} • ${activeGame.category} • Virtual Demo Only`;
+      renderGameStage();
+      document.getElementById('gameModal').classList.add('open');
+    }
+
+    function closeGameModal() {
+      stopCrashLoop();
+      closeModal('gameModal');
+    }
+
+    function renderGameStage() {
+      const stage = document.getElementById('gameStage');
+      if (activeGame.engine === 'slot') {
+        stage.innerHTML = `
+          <div style="font-size:0.86rem; color:var(--text-muted);">Match 2 or 3 symbols for Virtual Coin multipliers!</div>
+          <div class="reels-row">
+            <div class="reel-box" id="reel0">${activeGame.emoji}</div>
+            <div class="reel-box" id="reel1">💎</div>
+            <div class="reel-box" id="reel2">👑</div>
+          </div>
+          <button class="btn-gold" id="spinBtn" onclick="playSlotDemo()">🎰 SPIN DEMO</button>
+          <div class="result-banner" id="gameResult">Ready to spin!</div>
+        `;
+      } else if (activeGame.engine === 'crash') {
+        stage.innerHTML = `
+          <div style="font-size:0.86rem; color:var(--text-muted);">Launch & Cash Out before the multiplier crashes!</div>
+          <div class="crash-display" id="crashValue">1.00x</div>
+          <div style="display:flex; justify-content:center; gap:10px;">
+            <button class="btn-gold" id="crashStartBtn" onclick="startCrashDemo()">🚀 Launch Demo</button>
+            <button class="btn-outline" id="crashCashBtn" onclick="cashOutCrash()" disabled>💰 Cash Out</button>
+          </div>
+          <div class="result-banner" id="gameResult">Place your virtual bet and launch!</div>
+        `;
+      } else {
+        stage.innerHTML = `
+          <div style="font-size:0.86rem; color:var(--text-muted);">Tap a target below to fire & uncover instant multipliers!</div>
+          <div class="arcade-grid">
+            ${[0,1,2,3,4,5].map(i => `<button class="arcade-target" onclick="fireArcade(${i}, this)">${activeGame.emoji}</button>`).join('')}
+          </div>
+          <div class="result-banner" id="gameResult">Select any target to play!</div>
+        `;
+      }
+    }
+
+    function playSlotDemo() {
+      const wallet = getWallet();
+      if (wallet.coins < currentBet) return showToast('Not enough Virtual Coins — refill in Wallet!');
+
+      const btn = document.getElementById('spinBtn');
+      const resEl = document.getElementById('gameResult');
+      const reels = [0,1,2].map(i => document.getElementById(`reel${i}`));
+      const symbols = [activeGame.emoji, '💎', '👑', '🪙', '⚡'];
+
+      wallet.coins -= currentBet;
+      wallet.spins += 1;
+      updateHeaderAndStats();
+
+      btn.disabled = true;
+      resEl.textContent = 'Spinning...';
+      resEl.style.color = 'var(--text-muted)';
+      reels.forEach(r => r.classList.add('spinning'));
+
+      setTimeout(() => {
+        reels.forEach(r => r.classList.remove('spinning'));
+        const picks = reels.map(r => {
+          const s = symbols[Math.floor(Math.random() * symbols.length)];
+          r.textContent = s;
+          return s;
+        });
+
+        let win = 0;
+        if (picks[0] === picks[1] && picks[1] === picks[2]) {
+          win = currentBet * 5;
+          resEl.textContent = `🎉 MEGA JACKPOT! +${win.toLocaleString()} Virtual Coins!`;
+          resEl.style.color = 'var(--gold-bright)';
+        } else if (picks[0] === picks[1] || picks[1] === picks[2] || picks[0] === picks[2]) {
+          win = Math.round(currentBet * 1.8);
+          resEl.textContent = `✨ Nice Win! +${win.toLocaleString()} Virtual Coins!`;
+          resEl.style.color = 'var(--success)';
+        } else {
+          resEl.textContent = 'No match this spin — try again!';
+          resEl.style.color = '#fca5a5';
+        }
+
+        if (win > 0) {
+          wallet.coins += win;
+          addLog(`Won ${win.toLocaleString()} Coins in ${activeGame.title}`);
+        }
+        saveAll();
+        updateHeaderAndStats();
+        btn.disabled = false;
+      }, 650);
+    }
+
+    function stopCrashLoop() {
+      clearInterval(crashTimer);
+      crashActive = false;
+    }
+
+    function startCrashDemo() {
+      if (crashActive) return;
+      const wallet = getWallet();
+      if (wallet.coins < currentBet) return showToast('Not enough Virtual Coins — refill in Wallet!');
+
+      wallet.coins -= currentBet;
+      wallet.spins += 1;
+      saveAll();
+      updateHeaderAndStats();
+
+      crashActive = true;
+      crashMultiplier = 1.00;
+      crashTarget = Number((1.15 + Math.random() * 3.8).toFixed(2));
+
+      const valEl = document.getElementById('crashValue');
+      const startBtn = document.getElementById('crashStartBtn');
+      const cashBtn = document.getElementById('crashCashBtn');
+      const resEl = document.getElementById('gameResult');
+
+      startBtn.disabled = true;
+      cashBtn.disabled = false;
+      resEl.textContent = 'Rising... cash out before crash!';
+      resEl.style.color = 'var(--gold-bright)';
+
+      crashTimer = setInterval(() => {
+        crashMultiplier = Number((crashMultiplier + 0.06).toFixed(2));
+        valEl.textContent = crashMultiplier.toFixed(2) + 'x';
+        if (crashMultiplier >= crashTarget) {
+          stopCrashLoop();
+          startBtn.disabled = false;
+          cashBtn.disabled = true;
+          valEl.style.color = 'var(--danger)';
+          resEl.textContent = `💥 Crashed at ${crashTarget.toFixed(2)}x!`;
+          resEl.style.color = '#fca5a5';
+          setTimeout(() => { if (valEl) valEl.style.color = 'var(--gold-bright)'; }, 900);
+        }
+      }, 90);
+    }
+
+    function cashOutCrash() {
+      if (!crashActive) return;
+      stopCrashLoop();
+      const wallet = getWallet();
+      const win = Math.round(currentBet * crashMultiplier);
+      wallet.coins += win;
+      addLog(`Cashed out ${crashMultiplier.toFixed(2)}x (+${win.toLocaleString()} Coins) in ${activeGame.title}`);
+      saveAll();
+      updateHeaderAndStats();
+
+      document.getElementById('crashStartBtn').disabled = false;
+      document.getElementById('crashCashBtn').disabled = true;
+      const resEl = document.getElementById('gameResult');
+      resEl.textContent = `💰 Cashed out at ${crashMultiplier.toFixed(2)}x! +${win.toLocaleString()} Coins!`;
+      resEl.style.color = 'var(--success)';
+    }
+
+    function fireArcade(idx, btn) {
+      const wallet = getWallet();
+      if (wallet.coins < currentBet) return showToast('Not enough Virtual Coins — refill in Wallet!');
+
+      wallet.coins -= currentBet;
+      wallet.spins += 1;
+
+      const mults = [0, 0.5, 1.5, 2, 3, 5];
+      const m = mults[Math.floor(Math.random() * mults.length)];
+      const win = Math.round(currentBet * m);
+      wallet.coins += win;
+
+      const resEl = document.getElementById('gameResult');
+      btn.textContent = m > 0 ? `${m}x` : '💨';
+      setTimeout(() => { if (btn) btn.textContent = activeGame.emoji; }, 750);
+
+      if (win > 0) {
+        resEl.textContent = `🎯 Hit ${m}x! +${win.toLocaleString()} Virtual Coins!`;
+        resEl.style.color = win >= currentBet ? 'var(--gold-bright)' : 'var(--success)';
+        if (win > currentBet) addLog(`Scored ${win.toLocaleString()} Coins in ${activeGame.title}`);
+      } else {
+        resEl.textContent = 'Target escaped! Fire again!';
+        resEl.style.color = '#fca5a5';
+      }
+
+      saveAll();
+      updateHeaderAndStats();
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('open');
+    }
+
+    // Close modals on backdrop click
+    document.querySelectorAll('.modal-backdrop').forEach(bd => {
+      bd.addEventListener('click', e => {
+        if (e.target === bd) {
+          if (bd.id === 'gameModal') stopCrashLoop();
+          bd.classList.remove('open');
+        }
+      });
+    });
+
+    // ---------- INIT ----------
+    updateHeaderAndStats();
+    renderGames();
+  </script>
+</body>
+</html>
